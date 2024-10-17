@@ -1409,6 +1409,10 @@ def scale_by_zoom_linesearch(
       interval is reduced below ``stepsize_precision`` and a stepsize satisfying
       a sufficient decrease has been found, the algorithm selects that stepsize
       even if the curvature condition is not satisfied.
+    value_dtype: using this linesearch in a JIT-compiled function can result in
+      the function being compiled twice instead of just once. You can prevent
+      this re-compilation by explicitly specifying, through this argument, the
+      dtype that is to be returned by the value function.
     verbose: whether to print additional debugging information in case the
       linesearch fails.
 
