@@ -1248,6 +1248,7 @@ def scale_by_zoom_linesearch(
     curv_rtol: float = 0.9,
     approx_dec_rtol: Optional[float] = 1e-6,
     stepsize_precision: float = 1e-5,
+    value_dtype: Optional[jnp.dtype] = None,
     verbose: bool = False,
     ) -> base.GradientTransformationExtraArgs:
   r"""Linesearch ensuring sufficient decrease and small curvature.
@@ -1433,12 +1434,12 @@ def scale_by_zoom_linesearch(
     """Initializes state of scale_by_zoom_linesearch."""
     return ScaleByZoomLinesearchState(
         learning_rate=jnp.asarray(1.0),
-        value=jnp.asarray(jnp.inf),
+        value=jnp.asarray(jnp.inf, dtype=value_dtype),
         grad=otu.tree_zeros_like(params),
         info=ZoomLinesearchInfo(
-            num_linesearch_steps=jnp.asarray(0),
-            decrease_error=jnp.asarray(jnp.inf),
-            curvature_error=jnp.asarray(jnp.inf),
+            num_linesearch_steps=jnp.asarray(0, dtype=jnp.int32),
+            decrease_error=jnp.asarray(jnp.inf, dtype=value_dtype),
+            curvature_error=jnp.asarray(jnp.inf, dtype=value_dtype),
         ),
     )
 
