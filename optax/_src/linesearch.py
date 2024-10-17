@@ -651,7 +651,7 @@ def zoom_linesearch(
     # equation (3.7a) of [Nocedal and Wright, 1999]
     decrease_error = jnp.asarray(
         value_step - value_init - slope_rtol * stepsize * slope_init,
-        dtype = value_init.dtype
+        dtype=value_init.dtype
     )
     if approx_dec_rtol is not None:
       # or an approximate decrease criterion, see equation (23) of
