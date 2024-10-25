@@ -1448,17 +1448,16 @@ def scale_by_zoom_linesearch(
       *,
       value: chex.Numeric,
       grad: base.Updates,
-      value_fn: Callable[..., tuple[chex.Numeric, base.Updates]],
+      value_and_grad_fn: Callable[..., tuple[chex.Numeric, base.Updates]],
       **extra_args: dict[str, Any],
   ) -> tuple[base.Updates, ScaleByZoomLinesearchState]:
     """Scales updates using the zoom linesearch.
 
-    .. warning:: The objective to minimize, ``value_fn``, can take more than
-        one input, but must return a single scalar (``float`` or scalar 
-        ``jax.Array``). If the function requires more than one input, the
-        additional inputs need to be fed to the update, see the example in the
-        docstring of the transform. The function value_fn needs to be amenable
-        to differentiation in JAX.
+    .. warning:: The objective to minimize, ``value_and_grad_fn``, can take more than
+        one input, but must return a tuple of i) a single scalar (``float`` or scalar
+        ``jax.Array``) and ii) the gradient thereof. If the function requires more than
+        one input, the additional inputs need to be fed to the update, see the example
+        in the docstring of the transform.
 
     Args:
       updates: current updates.
@@ -1466,8 +1465,8 @@ def scale_by_zoom_linesearch(
       params: current parameters.
       value: value of the function at the current params.
       grad: gradient of the function at the current params.
-      value_fn: function returning the value of the function we seek to
-        optimize.
+      value_and_grad_fn: function returning the value and the gradient of the function
+        we seek to optimize.
       **extra_args: additional keyword arguments, if the function needs
         additional arguments such as input data, they should be put there.
 
@@ -1475,12 +1474,11 @@ def scale_by_zoom_linesearch(
       updates: updates for the params (new_params = params + updates).
       state: updated state.
     """
-    # Fetch arguments to be fed to value_fn from the extra_args
+    # Fetch arguments to be fed to value_and_grad_fn from the extra_args
     (fn_kwargs,), remaining_kwargs = utils._extract_fns_kwargs(  # pylint: disable=protected-access
-        (value_fn,), extra_args
+        (value_and_grad_fn,), extra_args
     )
     del remaining_kwargs
-    value_and_grad_fn = jax.value_and_grad(value_fn)
 
     stepsize_guess = state.learning_rate
     init_state = init_ls(
